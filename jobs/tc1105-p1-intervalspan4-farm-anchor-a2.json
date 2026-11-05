@@ -1,0 +1,85 @@
+{
+  "action": "fresh_rebuild",
+  "approval": {
+    "path": "approvals/tc1105-p1-intervalspan4-farm-anchor-a2.json",
+    "sha256": "23c30548a2e8497194c2d7e73309ab4bdc99494613d0be08c6ce18a46b00d94f"
+  },
+  "attempt_id": "tc1105-p1-intervalspan4-farm-anchor-a2",
+  "candidate_id": "candidate-p1-intervalspan4-anchor",
+  "cutoff": "2026-11-05T19:13:55.762650+00:00",
+  "destination": "farm",
+  "inputs": [
+    {
+      "path": "designs/intervalspan4/config.json",
+      "role": "config",
+      "sha256": "51b7e4669801759112cf0a562d9224f3d91a78e4f4aa536be31a995b8ad2a7c5"
+    },
+    {
+      "path": "designs/intervalspan4/constraints.sdc",
+      "role": "constraints",
+      "sha256": "ad7e64662787155eadfbe737a17b0144f745c917306ef47968f08254a505e27c"
+    },
+    {
+      "path": "designs/intervalspan4/pins.cfg",
+      "role": "pin_order",
+      "sha256": "4eb513fe7fe5546630366e91da723ea5ce4dad076f668926cf44df1d390a3645"
+    },
+    {
+      "path": "designs/intervalspan4/rtl.v",
+      "role": "rtl",
+      "sha256": "4a41e5b4d4bd3e1c875ffecef4b834e0dfea42862e53418f881a531391d103ff"
+    }
+  ],
+  "job_id": "tc1105-p1-intervalspan4-farm-anchor-a2",
+  "method_id": "shared_anchor",
+  "platform": {
+    "area_unit": "um2",
+    "contract": {
+      "path": "farm/sky130-hd.json",
+      "sha256": "98b1ebcfc15d03de69b236baeb64320fdd0d2f788b23e3821e20e2aede684f1a"
+    },
+    "corners": [
+      "nom_tt_025C_1v80",
+      "nom_ss_100C_1v60",
+      "nom_ff_n40C_1v95",
+      "min_tt_025C_1v80",
+      "min_ss_100C_1v60",
+      "min_ff_n40C_1v95",
+      "max_tt_025C_1v80",
+      "max_ss_100C_1v60",
+      "max_ff_n40C_1v95"
+    ],
+    "io_policy": "Fixed 1.00 ns input and output delays on data and reset ports, unchanged drive/load, 0.25 ns clock uncertainty.",
+    "library": "sky130_fd_sc_hd",
+    "pdk": "sky130A",
+    "time_unit": "ns"
+  },
+  "repository": "Avi-Patel-1/trueclock-lab",
+  "request_id": "req-tc1105-p1-intervalspan4-farm-anchor-a2",
+  "resources": {
+    "memory_gib": 5,
+    "threads": 2,
+    "timeout_seconds": 480
+  },
+  "runner": {
+    "backend": "librelane",
+    "config": {
+      "path": "designs/intervalspan4/config.json",
+      "sha256": "51b7e4669801759112cf0a562d9224f3d91a78e4f4aa536be31a995b8ad2a7c5"
+    },
+    "design": "intervalspan4",
+    "script": "scripts/run_flow.py",
+    "sha256": "a8888f28cc2181d47d219c154f6c311d1862a2def6e59c55e723e62b6714bfd6"
+  },
+  "schema_version": "trueclock.physical-request.v1",
+  "source_formal": {
+    "evidence": {
+      "path": "proofs/intervalspan4.json",
+      "sha256": "53c087dac156cac97f780d5e1c30b0a81bebc450598d21d2d5a18d5a79ef0e57"
+    },
+    "scope": "Source RTL equivalence under the published two-edge synchronous-reset contract; separately check the final mapped netlist.",
+    "state": "passed"
+  },
+  "stop_new_heavy": "2026-11-05T18:13:55.762650+00:00",
+  "target_period_ns": 10
+}

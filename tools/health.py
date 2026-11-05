@@ -33,7 +33,7 @@ def capture():
         and env["GITHUB_RUN_ATTEMPT"] == "1"
     ):
         raise RuntimeError("Health job received an unexpected repository, runner, ref or attempt")
-    files = git("ls-files").splitlines()
+    files = [".github/workflows/health.yml", "README.md", "farm/toolchain.json", "tools/health.py"]
     disk = shutil.disk_usage(".")
     mem = {key: int(value.split()[0]) * 1024 for key, value in
            (line.split(":", 1) for line in Path("/proc/meminfo").read_text().splitlines())
@@ -47,7 +47,8 @@ def capture():
         "cpu_count": os.cpu_count(), "disk_free_bytes": disk.free, "disk_total_bytes": disk.total,
         "memory_available_bytes": mem["MemAvailable"], "memory_total_bytes": mem["MemTotal"],
         "source_sha256": {name: hashlib.sha256(Path(name).read_bytes()).hexdigest() for name in files},
-        "physical_jobs": 0,
+        "physical_jobs": 0, "git_tree": git("rev-parse", "HEAD^{tree}"),
+        "tracked_files": len(git("ls-files").splitlines()),
     }
     output = json.dumps(result, sort_keys=True, indent=2) + "\n"
     if len(output.encode()) > 4096:

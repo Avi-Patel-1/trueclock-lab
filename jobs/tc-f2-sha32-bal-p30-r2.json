@@ -1,0 +1,90 @@
+{
+  "action": "fresh_rebuild",
+  "approval": {
+    "path": "approvals/tc-f2-sha32-bal-p30-r2.json",
+    "sha256": "87d85d1152b8b645e9bf186ca6babc51cb3bd2d1b2eb8a92921bb4b5434ce23b"
+  },
+  "attempt_id": "tc-f2-sha32-bal-p30-r2",
+  "candidate_id": "candidate-f2-sha32-bal-p30-v1",
+  "cutoff": "2026-11-05T19:13:55.762650+00:00",
+  "destination": "farm",
+  "inputs": [
+    {
+      "path": "designs/tc-f2-sha32-bal-p30-v1/config.json",
+      "role": "config",
+      "sha256": "b41e6ac05e9cdac9a1baa88a3e8fccd13fca013d11d86a1e59f17280b2380043"
+    },
+    {
+      "path": "designs/tc-f2-sha32-bal-p30-v1/constraints.sdc",
+      "role": "constraints",
+      "sha256": "52eceb33af3b66f3ba3d30811ee88a26145ec08000e5565e02142f02bafad195"
+    },
+    {
+      "path": "designs/tc-f2-sha32-bal-p30-v1/pin_order.cfg",
+      "role": "pin_order",
+      "sha256": "fa48655f139c48a9700c10d1840bc7d60bea8784971a37f163976dfb4896edef"
+    },
+    {
+      "path": "designs/tc-f2-sha32-bal-p30-v1/src/middle.v",
+      "role": "rtl",
+      "sha256": "f2137fbb233bff1041fc1c09ce9e4d62784c9c96b4f259ee94e12d8bada1b92c"
+    },
+    {
+      "path": "designs/tc-f2-sha32-bal-p30-v1/src/top.v",
+      "role": "rtl",
+      "sha256": "8cffcbaa7d3ed88c6484d307d7b28a18ca95b47ef52cb9f0834431940af810fb"
+    }
+  ],
+  "job_id": "tc-f2-sha32-bal-p30-r2",
+  "method_id": "sha_schedule",
+  "platform": {
+    "area_unit": "um2",
+    "contract": {
+      "path": "farm/sky130-hd.json",
+      "sha256": "98b1ebcfc15d03de69b236baeb64320fdd0d2f788b23e3821e20e2aede684f1a"
+    },
+    "corners": [
+      "nom_tt_025C_1v80",
+      "nom_ss_100C_1v60",
+      "nom_ff_n40C_1v95",
+      "min_tt_025C_1v80",
+      "min_ss_100C_1v60",
+      "min_ff_n40C_1v95",
+      "max_tt_025C_1v80",
+      "max_ss_100C_1v60",
+      "max_ff_n40C_1v95"
+    ],
+    "io_policy": "Fixed external delays and load from the immutable constraints.sdc across both period settings.",
+    "library": "sky130_fd_sc_hd",
+    "pdk": "sky130A",
+    "time_unit": "ns"
+  },
+  "repository": "Avi-Patel-1/trueclock-lab",
+  "request_id": "req-tc-f2-sha32-bal-p30-r2",
+  "resources": {
+    "memory_gib": 4,
+    "threads": 2,
+    "timeout_seconds": 1200
+  },
+  "runner": {
+    "backend": "librelane",
+    "config": {
+      "path": "designs/tc-f2-sha32-bal-p30-v1/config.json",
+      "sha256": "b41e6ac05e9cdac9a1baa88a3e8fccd13fca013d11d86a1e59f17280b2380043"
+    },
+    "design": "tc_sha256_schedule",
+    "script": "scripts/run_flow.py",
+    "sha256": "a8888f28cc2181d47d219c154f6c311d1862a2def6e59c55e723e62b6714bfd6"
+  },
+  "schema_version": "trueclock.physical-request.v1",
+  "source_formal": {
+    "evidence": {
+      "path": "proofs/sha32.json",
+      "sha256": "9fc8177ffb26f234379d005d5e154f843481ce8bb88ca3f3bb95b328b0eee080"
+    },
+    "scope": "Independent comparison of the balanced and carry-save registered source variants, with a separate mathematical reference.",
+    "state": "passed"
+  },
+  "stop_new_heavy": "2026-11-05T18:13:55.762650+00:00",
+  "target_period_ns": 30.0
+}

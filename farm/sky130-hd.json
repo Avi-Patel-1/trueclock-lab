@@ -1,0 +1,31 @@
+{
+  "corner_liberty_sha256": {
+    "sky130_fd_sc_hd__ff_n40C_1v95.lib": "fb61d91c55a7f85b1989e8149d040b13ba5e7f5478f5bf0c3c16c5da30720139",
+    "sky130_fd_sc_hd__ss_100C_1v60.lib": "9b24f0db3967ac67b4cae1f74bb480fd47922d18d0ed577e3c121739b412c361",
+    "sky130_fd_sc_hd__tt_025C_1v80.lib": "8e78e14442062dba34d414fca6490b2f6b96038d4510d1438ca44fee31487135"
+  },
+  "corners": [
+    "min_ff_n40C_1v95",
+    "min_ss_100C_1v60",
+    "min_tt_025C_1v80",
+    "nom_ff_n40C_1v95",
+    "nom_ss_100C_1v60",
+    "nom_tt_025C_1v80",
+    "max_ff_n40C_1v95",
+    "max_ss_100C_1v60",
+    "max_tt_025C_1v80"
+  ],
+  "dbu_per_micron": 1000,
+  "library": "sky130_fd_sc_hd",
+  "pdk": "sky130A",
+  "pdk_revision": "8afc8346a57fe1ab7934ba5a6056ea8b43078e71",
+  "standard_cell_area": "Exclude filler cells, in square micrometres.",
+  "tool_image": "ghcr.io/librelane/librelane@sha256:4bc9042ba177f73f275b5b39e7d372a07d3f4043f548a0ba7f640097b7205051",
+  "units": {
+    "area": "um^2",
+    "capacitance": "pF",
+    "leakage_power": "nW",
+    "length": "um",
+    "time": "ns"
+  }
+}

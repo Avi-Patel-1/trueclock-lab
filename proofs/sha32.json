@@ -1,0 +1,55 @@
+{
+  "candidate_rtl_sha256": "6ead2a24610f00b6299d86a7bf17234f7c31b9073a0fccc3f7a2bf0f45826dc8",
+  "comparison": "source_rtl_equivalence",
+  "full_receipt_sha256": "ffa1962ad4ef6cf45ec4ee0156b0e074c06b4e7d75b969da6ce3a68bf98abd85",
+  "image": "ghcr.io/librelane/librelane@sha256:bf76533ff7928b0c68f6232a6def27f23dee2a98541d2afc279e26f28702b0c0",
+  "mathematical_source_evidence": {
+    "path": "proofs/sha32-mathematical.json",
+    "sha256": "96807ceffd7bf985c88ef1ce4f2d5588f1de37e33002e8d6f84dd46b3d11f594"
+  },
+  "negative_control_status": "counterexample_replayed",
+  "proof_kind": "unbounded_edge_sampled_equivalence",
+  "properties": [
+    {
+      "elapsed_s": 0.2316682910000054,
+      "label": "reset-prefix-1",
+      "outcome": "proven"
+    },
+    {
+      "elapsed_s": 0.2825914999999668,
+      "label": "reset-prefix-2",
+      "outcome": "proven"
+    },
+    {
+      "elapsed_s": 1.879117959000041,
+      "label": "flush-window",
+      "outcome": "proven"
+    },
+    {
+      "elapsed_s": 0.22429016699993554,
+      "label": "actual-output-negative",
+      "outcome": "counterexample_replayed"
+    }
+  ],
+  "reference_rtl_sha256": "e198a1242339737282410f4655c3933932709be08d60ae8c174720a8ae20c1c7",
+  "schema": "a070-formal-v1",
+  "source_parts": {
+    "gate": [
+      {
+        "sha256": "8cffcbaa7d3ed88c6484d307d7b28a18ca95b47ef52cb9f0834431940af810fb"
+      },
+      {
+        "sha256": "33c538a482a3d9948285a16298e8e6666e82b8111d3980e223420404fd432c9b"
+      }
+    ],
+    "gold": [
+      {
+        "sha256": "8cffcbaa7d3ed88c6484d307d7b28a18ca95b47ef52cb9f0834431940af810fb"
+      },
+      {
+        "sha256": "f2137fbb233bff1041fc1c09ce9e4d62784c9c96b4f259ee94e12d8bada1b92c"
+      }
+    ]
+  },
+  "status": "passed"
+}

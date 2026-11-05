@@ -1,0 +1,85 @@
+{
+  "action": "fresh_rebuild",
+  "approval": {
+    "path": "approvals/tc1105-p1-phasedelta6-farm-anchor-a2.json",
+    "sha256": "f9e7aa5cc14aec664b53732c04e07300d2709447b42852239f73f09ac2f387e7"
+  },
+  "attempt_id": "tc1105-p1-phasedelta6-farm-anchor-a2",
+  "candidate_id": "candidate-p1-phasedelta6-anchor",
+  "cutoff": "2026-11-05T19:13:55.762650+00:00",
+  "destination": "farm",
+  "inputs": [
+    {
+      "path": "designs/phasedelta6/config.json",
+      "role": "config",
+      "sha256": "9c2a5db266e75450298d051330f222ce2b3a8db7535440eaec2954c105d73904"
+    },
+    {
+      "path": "designs/phasedelta6/constraints.sdc",
+      "role": "constraints",
+      "sha256": "ad7e64662787155eadfbe737a17b0144f745c917306ef47968f08254a505e27c"
+    },
+    {
+      "path": "designs/phasedelta6/pins.cfg",
+      "role": "pin_order",
+      "sha256": "4eb513fe7fe5546630366e91da723ea5ce4dad076f668926cf44df1d390a3645"
+    },
+    {
+      "path": "designs/phasedelta6/rtl.v",
+      "role": "rtl",
+      "sha256": "a8048550c6a78a8022d8ae1d16fe0994741a16f3a02fe30f461fa0673d0579d5"
+    }
+  ],
+  "job_id": "tc1105-p1-phasedelta6-farm-anchor-a2",
+  "method_id": "shared_anchor",
+  "platform": {
+    "area_unit": "um2",
+    "contract": {
+      "path": "farm/sky130-hd.json",
+      "sha256": "98b1ebcfc15d03de69b236baeb64320fdd0d2f788b23e3821e20e2aede684f1a"
+    },
+    "corners": [
+      "nom_tt_025C_1v80",
+      "nom_ss_100C_1v60",
+      "nom_ff_n40C_1v95",
+      "min_tt_025C_1v80",
+      "min_ss_100C_1v60",
+      "min_ff_n40C_1v95",
+      "max_tt_025C_1v80",
+      "max_ss_100C_1v60",
+      "max_ff_n40C_1v95"
+    ],
+    "io_policy": "Fixed 1.00 ns input and output delays on data and reset ports, unchanged drive/load, 0.25 ns clock uncertainty.",
+    "library": "sky130_fd_sc_hd",
+    "pdk": "sky130A",
+    "time_unit": "ns"
+  },
+  "repository": "Avi-Patel-1/trueclock-lab",
+  "request_id": "req-tc1105-p1-phasedelta6-farm-anchor-a2",
+  "resources": {
+    "memory_gib": 5,
+    "threads": 2,
+    "timeout_seconds": 480
+  },
+  "runner": {
+    "backend": "librelane",
+    "config": {
+      "path": "designs/phasedelta6/config.json",
+      "sha256": "9c2a5db266e75450298d051330f222ce2b3a8db7535440eaec2954c105d73904"
+    },
+    "design": "phasedelta6",
+    "script": "scripts/run_flow.py",
+    "sha256": "a8888f28cc2181d47d219c154f6c311d1862a2def6e59c55e723e62b6714bfd6"
+  },
+  "schema_version": "trueclock.physical-request.v1",
+  "source_formal": {
+    "evidence": {
+      "path": "proofs/phasedelta6.json",
+      "sha256": "d81485fb72eeb786910e803959f9d10bb41f4f712e1857420fb2ca04371f7720"
+    },
+    "scope": "Source RTL equivalence under the published two-edge synchronous-reset contract; separately check the final mapped netlist.",
+    "state": "passed"
+  },
+  "stop_new_heavy": "2026-11-05T18:13:55.762650+00:00",
+  "target_period_ns": 10
+}

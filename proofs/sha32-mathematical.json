@@ -1,0 +1,44 @@
+{
+  "component_sha256": {
+    "balanced.v": "f2137fbb233bff1041fc1c09ce9e4d62784c9c96b4f259ee94e12d8bada1b92c",
+    "carry_save.v": "33c538a482a3d9948285a16298e8e6666e82b8111d3980e223420404fd432c9b",
+    "top.v": "8cffcbaa7d3ed88c6484d307d7b28a18ca95b47ef52cb9f0834431940af810fb"
+  },
+  "function": "one 32-bit SHA-256 message schedule expansion word as specified in FIPS 180-4 sections 4.1.2 and 6.2.2",
+  "input_domain_size_each": "2^128",
+  "method": "exhaustive_reachable_carry_states_and_frozen_wrapper_composition",
+  "negative_control": {
+    "actual_primary_inputs": {
+      "w_m15": 0,
+      "w_m16": 1,
+      "w_m2": 0,
+      "w_m7": 0
+    },
+    "control_out_word": 1,
+    "edit": [
+      "assign first = sum1 ^ carry1 ^ d;",
+      "assign first = sum1 ^ carry1 ^ a;"
+    ],
+    "input_valid_at_capture": 1,
+    "mutated_out_word": 0,
+    "observe_edges_after_capture": 2,
+    "out_valid": 1,
+    "source_sha256": "8196e47f11b47be8d16d0f9b667a3cbc94023eb3fd4b082b1a82af409be7193f"
+  },
+  "ports": "four unsigned words, synchronous active-high reset, input and output valid, 2 edges from input capture to output, II=1, bubble data compared",
+  "receipt_sha256": "b5e8c6701650d5c9dd98891a16921a2345f68b6ddb53115d3e14ceb65bb1199a",
+  "schema_version": "sha_schedule_source_evidence.v1",
+  "scope": "defined binary RTL signals, ideal rising edge, synchronous reset, all subsequent sequences. Physical and final-mapped checks are separate and currently unmeasured.",
+  "source_concatenation": "shared top followed by matching middle module, no delimiter",
+  "source_sha256": {
+    "balanced": "e198a1242339737282410f4655c3933932709be08d60ae8c174720a8ae20c1c7",
+    "carry_save": "6ead2a24610f00b6299d86a7bf17234f7c31b9073a0fccc3f7a2bf0f45826dc8"
+  },
+  "specification": "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf",
+  "status": "passed",
+  "transition_counts": {
+    "balanced": 3936,
+    "carry_save": 3920
+  },
+  "wrapper_sigma_basis_vectors": 64
+}

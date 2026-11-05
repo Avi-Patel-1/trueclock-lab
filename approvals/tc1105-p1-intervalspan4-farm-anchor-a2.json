@@ -1,0 +1,10 @@
+{
+  "approved_by": "root",
+  "candidate_id": "candidate-p1-intervalspan4-anchor",
+  "destination": "farm",
+  "id": "tc1105-p1-intervalspan4-farm-anchor-a2",
+  "proposal_sha256": "ddb4f8805ae50ae323e3ab369739141c406618642ed508afc37a1cf503e91dbf",
+  "repository": "Avi-Patel-1/trueclock-lab",
+  "request_id": "req-tc1105-p1-intervalspan4-farm-anchor-a2",
+  "wall_limit_s": 480
+}

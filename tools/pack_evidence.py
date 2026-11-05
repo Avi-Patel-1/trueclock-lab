@@ -1,0 +1,124 @@
+"""Package only bounded generated data. Record hashes for omitted design databases."""
+
+import gzip
+import hashlib
+import io
+import json
+import os
+import re
+import tarfile
+from pathlib import Path
+
+
+JOB = re.compile(r'[a-z0-9][a-z0-9_-]{0,62}\Z')
+MAX_UNPACKED = 240 * 1024 ** 2
+MAX_ARCHIVE = 32 * 1024 ** 2
+MAX_INDEX_BYTES = 1024 ** 2
+NATIVE_JSON = {'resolved.json', 'metrics.json', 'state_in.json', 'state_out.json',
+               'config.json', 'filter_unannotated_metrics.json'}
+RAW_ROOT = {'runner.json', 'flow.log', 'acquisition.log', 'toolchain.log'}
+FORBIDDEN_DIRS = {'.git', '.pdk', 'pdk', 'pdks', 'lib', 'libs', 'liberty', 'lef', 'techlef', 'tech'}
+LAYOUT_SUFFIXES = ('.gds', '.gds.gz', '.odb', '.def', '.def.gz', '.oas')
+
+
+def file_sha(path):
+    digest = hashlib.sha256()
+    with path.open('rb') as f:
+        for block in iter(lambda: f.read(1024 * 1024), b''):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def allowed_generated(relative):
+    name = relative.name
+    if set(map(str.lower, relative.parts)) & FORBIDDEN_DIRS:
+        return False
+    if len(relative.parts) == 1:
+        return name in RAW_ROOT
+    if relative.parts[:2] != ('design', 'runs') or len(relative.parts) < 4:
+        return False
+    header = name.endswith('.h.json') and ('json_h' in relative.parts or any(
+        segment.endswith('-yosys-jsonheader') for segment in relative.parts))
+    return (header or name in NATIVE_JSON or name.endswith(('.rpt', '.sdc', '.spef', '.spef.gz', '.nl.v', '.pnl.v'))
+            or name.endswith('.log') or ('final' in relative.parts and 'nl' in relative.parts and name.endswith('.v')))
+
+
+def add_bytes(archive, name, value):
+    entry = tarfile.TarInfo(name)
+    entry.size = len(value)
+    entry.mode = 0o644
+    archive.addfile(entry, io.BytesIO(value))
+
+
+def collect(job, destination):
+    if not JOB.fullmatch(job):
+        raise ValueError('Invalid job identifier')
+    root = Path('results') / job
+    if root.is_symlink() or root.parent.is_symlink():
+        raise ValueError('Invalid results directory')
+    destination.mkdir(exist_ok=False)
+    output = destination / 'result.tar.gz'
+    manifest = {'job': job, 'commit': os.environ['GITHUB_SHA'], 'run_id': int(os.environ['GITHUB_RUN_ID']),
+                'results_directory_present': root.is_dir(), 'retained': [], 'hash_only': [], 'errors': []}
+    total = 0
+    root = root.resolve()
+    def priority(file):
+        rel = file.relative_to(root)
+        if len(rel.parts) == 1:
+            return (0, str(rel))
+        if 'final' in rel.parts or any('stapostpnr' in segment.lower() for segment in rel.parts):
+            return (1, str(rel))
+        if rel.name in NATIVE_JSON or rel.name.endswith('.nl.v'):
+            return (2, str(rel))
+        return (3, str(rel))
+
+    candidates = sorted(root.rglob('*'), key=priority) if root.is_dir() else []
+    with output.open('xb') as f, gzip.GzipFile(fileobj=f, mode='wb', mtime=0) as gz, tarfile.open(fileobj=gz, mode='w|') as archive:
+        for file in candidates:
+            relative = file.relative_to(root)
+            if not file.is_file():
+                continue
+            keep = allowed_generated(relative)
+            layout = (relative.parts[:2] == ('design', 'runs') and file.name.endswith(LAYOUT_SUFFIXES)
+                      and not (set(map(str.lower, relative.parts)) & FORBIDDEN_DIRS))
+            if not keep and not layout:
+                continue
+            target = file.resolve()
+            if not target.is_relative_to(root) or set(map(str.lower, target.relative_to(root).parts)) & FORBIDDEN_DIRS:
+                manifest['errors'].append({'path': str(relative), 'reason': 'outside allowed result scope'})
+                continue
+            if keep and not allowed_generated(target.relative_to(root)):
+                manifest['errors'].append({'path': str(relative), 'reason': 'target type outside allowed evidence'})
+                continue
+            size = target.stat().st_size
+            entry = {'path': str(relative), 'bytes': size, 'sha256': file_sha(target)}
+            if layout or total + size > MAX_UNPACKED or f.tell() > MAX_ARCHIVE - 2 * 1024**2:
+                entry['reason'] = 'layout database' if layout else 'transport cap'
+                manifest['hash_only'].append(entry)
+                continue
+            header = tarfile.TarInfo(str(relative))
+            header.size = size
+            header.mode = 0o644
+            with target.open('rb') as content:
+                archive.addfile(header, content)
+            manifest['retained'].append(entry)
+            total += size
+        manifest_bytes = (json.dumps(manifest, indent=2, sort_keys=True) + '\n').encode()
+        if len(manifest_bytes) > MAX_INDEX_BYTES:
+            raise ValueError('Evidence inventory exceeds bound')
+        add_bytes(archive, 'inventory.json', manifest_bytes)
+    if output.stat().st_size > MAX_ARCHIVE:
+        # Always return the identity/hashes even if the generated byte package exceeds its bound.
+        # The oversized intermediate is local to this ephemeral runner and outside the upload path.
+        output.rename(destination / 'oversized.local.tar.gz')
+        manifest['errors'].append({'reason': 'compressed transport cap reached; raw package unavailable'})
+        manifest['hash_only'].extend({**rec, 'reason': 'compressed transport cap'} for rec in manifest['retained'])
+        manifest['retained'] = []
+        with tarfile.open(output, mode='x:gz') as archive:
+            add_bytes(archive, 'inventory.json', (json.dumps(manifest, sort_keys=True) + '\n').encode())
+    print(json.dumps({'artifact': str(output), 'bytes': output.stat().st_size, 'sha256': file_sha(output),
+                      'retained_files': len(manifest['retained']), 'hash_only_files': len(manifest['hash_only'])}))
+
+
+if __name__ == '__main__':
+    collect(os.environ['JOB_ID'], Path('collected'))
