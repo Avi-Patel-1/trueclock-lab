@@ -1,0 +1,8 @@
+{
+  "type": "reference_toolchain",
+  "physical_lane": "awaiting_qualification",
+  "container_image": "ghcr.io/librelane/librelane@sha256:4bc9042ba177f73f275b5b39e7d372a07d3f4043f548a0ba7f640097b7205051",
+  "pdk_family": "sky130",
+  "pdk_revision": "8afc8346a57fe1ab7934ba5a6056ea8b43078e71",
+  "pin_source": "https://github.com/Avi-Patel-1/beforeroute-farm/blob/32eacd15a8c8ccda1263ea86894d5a5b0fcdd046/.github/workflows/farm.yml"
+}
