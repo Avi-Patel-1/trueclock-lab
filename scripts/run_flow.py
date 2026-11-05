@@ -317,6 +317,75 @@ def bounded_lease(env_value,event_value,now,timeout):
     return remaining
 
 
+PDK_RELEASE_ID = 233817270
+RELEASE_URL = ('https://github.com/fossi-foundation/ciel-releases/releases/download/'
+               'sky130-'+PDK_VERSION+'/')
+ASSETS = {
+    'common.tar.zst': (274819141,6421325,'be8a548341fd9177af9e461ad7b4fdd89afbe03dba68dc42d155321fdc3f86bf'),
+    'sky130_fd_sc_hd.tar.zst': (274824784,127299820,'17047505cfff30841bf53960b8cbf9e7c79b2a3bbb2ebec0bb254eb441e4ce1e'),
+}
+# The archive names and hashes are pinned to the public Ciel release. The worker has
+# no network during extraction and the subsequent Ciel command can only enable local files.
+UNPACK = '''import hashlib, pathlib, shutil, sys, tarfile, zstandard
+assets=pathlib.Path(sys.argv[1])
+target=pathlib.Path(sys.argv[2])
+target.mkdir(parents=True,exist_ok=False)
+total=0
+files=0
+for name,expected in zip(sys.argv[3::2],sys.argv[4::2]):
+    archive=assets/name
+    with archive.open("rb") as raw:
+        if hashlib.file_digest(raw,"sha256").hexdigest()!=expected:
+            raise ValueError("compressed archive SHA mismatch: "+name)
+    with zstandard.open(archive,mode="rb") as source, tarfile.open(fileobj=source,mode="r|") as tar:
+        for entry in tar:
+            rel=pathlib.PurePosixPath(entry.name)
+            if rel.is_absolute() or ".." in rel.parts or not rel.parts or rel.parts[0] not in ("sky130A","sky130B"):
+                raise ValueError("unsupported archive path: "+entry.name)
+            if entry.isdir():
+                continue
+            if not entry.isfile():
+                raise ValueError("unsupported archive member type: "+entry.name)
+            files+=1
+            total+=entry.size
+            if files>90000 or total>4*(1<<30):
+                raise ValueError("PDK extraction bound exceeded")
+            out=target/rel
+            out.parent.mkdir(parents=True,exist_ok=True)
+            with tar.extractfile(entry) as src, out.open("xb") as dst:
+                shutil.copyfileobj(src,dst,1024*1024)
+            if out.stat().st_size!=entry.size:
+                raise ValueError("short extracted file")
+print("PDK extracted",files,total)
+'''
+
+
+def obtain_pdk(root,pdk,common,ctx,result,jid):
+    cache=root/('.pdk-sources-'+jid)
+    cache.mkdir()
+    log=result/'acquisition.log'
+    metadata={}
+    for name,(asset_id,size,digest) in ASSETS.items():
+        dest=cache/name
+        command=['curl','--proto','=https','--proto-redir','=https','--location','--fail','--silent','--show-error',
+                 '--connect-timeout','10','--max-time','90','--retry','2','--retry-delay','2',
+                 '--retry-max-time','180','--retry-all-errors','--max-filesize',str(size),'--output',str(dest),
+                 RELEASE_URL+name]
+        run_command(command,log,ctx)
+        check(dest.is_file() and dest.stat().st_size==size and checksum(dest)==digest, 'PDK release archive mismatch: '+name)
+        metadata[name]={'release_id':PDK_RELEASE_ID,'asset_id':asset_id,'bytes':size,'sha256':digest}
+    name='trueclock-unpack-'+jid
+    args=[part for key,(_,_,digest) in ASSETS.items() for part in (key,digest)]
+    run_command([*common,'--name',name,'--network','none','-v',f'{cache}:/assets:ro','-v',f'{pdk}:/pdk',IMAGE,
+                 'python3','-c',UNPACK,'/assets','/pdk/ciel/sky130/versions/'+PDK_VERSION,*args],log,ctx,container=name)
+    name='trueclock-enable-'+jid
+    run_command([*common,'--name',name,'--network','none','-v',f'{pdk}:/pdk',IMAGE,
+                 'ciel','enable','--pdk-root','/pdk','--pdk-family','sky130','-l','sky130_fd_sc_hd',PDK_VERSION],
+                log,ctx,container=name)
+    pdk_ready(pdk)
+    return metadata
+
+
 def run(root, req, design, files, refs, result, head):
     r = req['resources']
     jid = req['job_id']
@@ -344,18 +413,14 @@ def run(root, req, design, files, refs, result, head):
               IMAGE in value.get('RepoDigests', []), 'installed image identity differs')
         record['image_id'] = value['Id']
         pdk = root/'pdk'
-        pdk.mkdir(exist_ok=True)
+        pdk.mkdir(exist_ok=False)
         check(pdk.resolve() == pdk, 'symlinked PDK root refused')
         common = ['docker','run','--rm','--pull','never','--platform','linux/amd64',
                   '--label',OWNER+'='+owner,'--cpus',str(r['threads']),
                   '--memory',str(int(r['memory_gib']*1024))+'m',
                   '--user',f'{os.getuid()}:{os.getgid()}','-e','HOME=/tmp','-e','PDK_ROOT=/pdk']
         record['units_evidence'] = image_contract(common,result,ctx)
-        if not (pdk/'sky130A').exists():
-            name = 'trueclock-pdk-'+jid
-            run_command([*common,'--name',name,'-v',f'{pdk}:/pdk',IMAGE,
-                         'ciel','enable','--pdk-family','sky130',PDK_VERSION],image_log,ctx,container=name)
-        pdk_ready(pdk)
+        record['pdk_release_assets']=obtain_pdk(root,pdk,common,ctx,result,jid)
         # Input staging makes the only writable project bind an empty run directory.
         isolated = result/'design'
         isolated.mkdir()

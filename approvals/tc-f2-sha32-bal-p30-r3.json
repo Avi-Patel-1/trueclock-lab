@@ -1,0 +1,10 @@
+{
+  "approved_by": "root",
+  "candidate_id": "candidate-f2-sha32-bal-p30-v1",
+  "destination": "farm",
+  "id": "tc-f2-sha32-bal-p30-r3",
+  "proposal_sha256": "6b472b670ba1d6391178f0ff120fd755ae71af39b8afaee979b08e80377f5766",
+  "repository": "Avi-Patel-1/trueclock-lab",
+  "request_id": "req-tc-f2-sha32-bal-p30-r3",
+  "wall_limit_s": 1200
+}
